@@ -1,12 +1,16 @@
 import hashlib
 import json
 import time
+from urllib.parse import urlparse
+
+import requests
 
 
 class BlockChain(object):
     def __init__(self):
         self.chain = []
         self.current_transactions = []
+        self.nodes = set()
         self._create_genesis_block()
 
     def _create_genesis_block(self):
@@ -99,4 +103,56 @@ class BlockChain(object):
         """
         guess = f'{last_proof}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
-        return guess_hash.startswith('00000')
+        return guess_hash.startswith('0000')
+
+    def register_node(self, address):
+        """
+        Params:
+            address: address of the node
+                     e.g. http://192.168.0.5:5000
+        """
+        parse_url = urlparse(address)
+        self.nodes.add(parse_url.netloc)
+
+    def valid_chain(self, chain):
+        """
+        Determine if a given blockchain is valid
+
+        Params:
+            chain: a blockchain.chain
+
+        Returns:
+            bool
+        """
+        last_block = chain[0]
+        if len(chain) < 2:
+            return False
+        for block, block_next in zip(chain, chain[1:]):
+            if block_next['previous_hash'] != self.hash(block):
+                return False
+            if not self.valid_proof(block['proof'], block_next['proof']):
+                return False
+        return True
+
+    def resolve_conflicts(self):
+        """
+        The consensus algorithm.
+
+        It resolves conflicts by replacing our chain with the longest one in the network.
+
+        Returns:
+            bool
+        """
+        new_chain = None
+        max_length = len(self.chain)
+        for node in self.nodes:
+            resp = requests.get(f'http://{node}/chain')
+            length = resp.json()['length']
+            chain = resp.json()['chain']
+            if length > max_length and self.valid_chain(chain):
+                max_length = length
+                new_chain = chain
+        if new_chain:
+            self.chain = new_chain
+            return True
+        return False

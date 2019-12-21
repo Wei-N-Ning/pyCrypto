@@ -1,3 +1,5 @@
+import argparse
+import sys
 import uuid
 
 import flask
@@ -57,5 +59,35 @@ def full_chain():
     return flask.jsonify(response), 200
 
 
+@app.route('/nodes/register', methods=['POST'])
+def register_nodes():
+    values = flask.request.get_json()
+    if not values.get('nodes'):
+        return 'expect a list of nodes', 400
+    for node in values['nodes']:
+        blockchain.register_node(node)
+    resp = {
+        'message': 'New nodes have been added',
+        'total_nodes': list(blockchain.nodes),
+    }
+    return flask.jsonify(resp), 201
+
+
+@app.route('/nodes/resolve', methods=['GET'])
+def consensus():
+    if blockchain.resolve_conflicts():
+        resp = {
+            'message': 'chain has been replaced',
+            'new_chain': blockchain.chain
+        }
+    else:
+        resp = {'message': 'chain is the source of truth'}
+    return flask.jsonify(resp), 200
+
+
 def main():
-    app.run(host='0.0.0.0', port=5000)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-a', '--address', default='0.0.0.0')
+    parser.add_argument('-p', '--port', type=int, default=5000)
+    arg = parser.parse_args(sys.argv[1:])
+    app.run(host=arg.address, port=arg.port)
