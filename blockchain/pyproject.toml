@@ -8,7 +8,7 @@ authors = ["Wei Ning <macgnw@gmail.com>"]
 python = "^3.7"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+pytest = "5.3.2"
 Flask = "0.12.2" 
 requests = "2.18.4" 
 

@@ -17,6 +17,25 @@ of adding package to the containing virtualenv)**
 Beware that `*.egg-info` directories are not added to gitignore by
 default; I need to do that manually
 
+**UPDATE**: Ubuntu18 setup
+
+.venv works on U18 - I need to:
+
+- read <https://python-poetry.org/docs/configuration/#available-settings> and deactivate virtualenv; remove virtualenv activation from bash-rc
+- read <https://github.com/pyenv/pyenv#installation> and properly install pyenv; remove any custom python exec symbolic links and clean up $PATH
+- make sure pyenv init pyenv virtual-env init is in the rc file; 
+- run `pyenv install <python version>`, then pyenv global to choose this version
+- now running `python` in the poetry project dir will see the expect version of python interpreter
+- run `poetry config` (see link 1) to enable environment isolation
+- poetry install works now; .venv directory is created
+- make sure .venv is add in .gitignore
+
+after changing version in the toml file, I need to run `poetry update` to download all the new packages;
+
+to run pytest using the isolated environment, run `poetry run pytest`
+
+TODO: how to get rid of the "deprecation" warnings thrown frmo pytest ????
+
 ### Testing
 
 `pytest` to run the unit tests;
