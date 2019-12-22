@@ -19,14 +19,22 @@ default; I need to do that manually
 
 ### Testing
 
-`pytest`
+`pytest` to run the unit tests;
 
 pytest package dependency is added in the toml file as part of the
 initial skeleton
 
+use postman to test the endpoint; use `-p <port>` to run multiple "nodes" to test the consensus algorithm
+
 ### Running
 
-`poetry run main`
+```bash
+poetry run main
+poetry run main -p 6000
+poetry run main -a 0.0.0.0 -p 24325
+```
+
+Note: **poetry does not use -- to separate target from its arguments**
 
 ```text
 [tool.poetry.scripts]
