@@ -4,7 +4,10 @@ source: <https://hackernoon.com/learn-blockchains-by-building-one-117428612f46>
 
 ## Running and testing
 
-this sub project is built by poetry.
+this sub project is built by poetry (and also uses pyenv's global interpreter
+version control).
+
+pyenv: <https://github.com/pyenv/pyenv-installer>
 
 ### New project initialization
 
