@@ -31,6 +31,9 @@ default; I need to do that manually
 - now running `python` in the poetry project dir will see the expect version of python interpreter
 - run `poetry config` (see link 1) to enable environment isolation, e.g.
   `poetry config virtualenvs.in-project true`
+  NOTE: if I forgot to this step and the dependencies were installed in the global dir I have to 
+        use `poetry config --list` to find the global dir and **DELETE ITS CONTENTS** in order to force
+        poetry respect the local `.venv` strategy
 - poetry install works now; .venv directory is created
 - make sure .venv is add in .gitignore
 
