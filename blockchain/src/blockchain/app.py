@@ -4,7 +4,7 @@ import uuid
 
 import flask
 
-from .lib import BlockChain
+from blockchain.lib import BlockChain
 
 app = flask.Flask('simple blockchain')
 node_identifier = str(uuid.uuid4()).replace('-', '')
