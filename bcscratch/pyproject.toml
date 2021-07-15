@@ -6,10 +6,15 @@ authors = ["Wei Ning (DA) <wei.ning@digitalasset.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+# general house-keeping
 pylint = "^2.9.3"
 mypy = "^0.910"
 yapf = "^0.31.0"
+# for note-taking
 jupyter = "^1.0.0"
+# needed by the project
+requests = "^2.26.0"
+matplotlib = "^3.4.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
