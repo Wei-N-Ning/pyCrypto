@@ -1,7 +1,7 @@
 import hashlib
 import unittest
 
-import PIL
+from PIL import Image
 
 
 def hash_string(s: str) -> str:
@@ -18,7 +18,7 @@ def hash_string(s: str) -> str:
     return hashlib.sha512(s.encode('utf-8')).hexdigest()
 
 
-def hash_img(img: PIL.Image) -> str:
+def hash_img(img: Image) -> str:
     """
     reference:
     https://stackoverflow.com/questions/30658193/python3-how-to-make-a-bytes-object-from-a-list-of-integers
@@ -50,7 +50,7 @@ class TestHashThings(unittest.TestCase):
         print(o)
 
     def test_hash_image(self):
-        img = PIL.Image.new('RGB', (8, 8), "black")  # Create a new black image
+        img = Image.new('RGB', (8, 8), "black")  # Create a new black image
         pixels = img.load()  # Create the pixel map
         for i in range(img.size[0]):  # For every pixel:
             for j in range(img.size[1]):
