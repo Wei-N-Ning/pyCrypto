@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+poetry run jupyter-kernelspec list
+
+cat <<"TEXT"
+
+To update the kernel name:
+
+1) find the kernel location: poetry run jupyter-kernelspec list
+
+2) vim path/to/kernel.json
+
+To set or change the default browser:
+
+1) run: poetry run jupyter --generate-config
+
+2) modify the config file, /home/weining/.jupyter/jupyter_notebook_config.py, adding c.NotebookApp.browser = u'...'
+
+TEXT
+
+poetry run jupyter notebook ./notebooks
