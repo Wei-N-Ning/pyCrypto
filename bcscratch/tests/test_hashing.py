@@ -35,6 +35,14 @@ def hash_img(img: PIL.Image) -> str:
     return hashlib.sha512(b''.join(bytes(b3) for b3 in img.getdata())).hexdigest()
 
 
+def hash_secret(msg: str, scr: str) -> str:
+    return hash_string(msg + scr)
+
+
+def verify_message(msg: str, h: str, scr: str) -> bool:
+    return hash_string(msg + scr) == h
+
+
 class TestHashThings(unittest.TestCase):
     def test_hash_word(self):
         o = hash_string('hello world')
@@ -50,3 +58,10 @@ class TestHashThings(unittest.TestCase):
         o = hash_img(img)
         self.assertTrue(o)
         print(o)
+
+    def test_hash_message_with_secret(self):
+        msg = 'there is a cow'
+        scr = 'e1m1_iddqd'
+        o = hash_secret(msg, scr)
+        self.assertTrue(verify_message(msg, o, scr))
+        self.assertFalse(verify_message('there is a c0w', o, scr))
