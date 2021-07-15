@@ -15,6 +15,7 @@ jupyter = "^1.0.0"
 # needed by the project
 requests = "^2.26.0"
 matplotlib = "^3.4.2"
+pynacl = "^1.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
