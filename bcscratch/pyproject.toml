@@ -14,8 +14,19 @@ yapf = "^0.31.0"
 jupyter = "^1.0.0"
 # needed by the project
 requests = "^2.26.0"
+# to demo image-hashing (matplotlib brings in PIL)
 matplotlib = "^3.4.2"
+# for public-private key authentication and digital signing
 pynacl = "^1.4.0"
+# logging lib
+structlog = "^21.1.0"
+# allow colorful output in logging
+colorama = "^0.4.4"
+# validate data structures such as JSON messages (the transactions)
+marshmallow = "^3.12.2"
+marshmallow-oneofschema = "^3.0.1"
+# async HTTP client - need this to find our public IP address
+aiohttp = "^3.7.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
