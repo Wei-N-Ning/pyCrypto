@@ -26,7 +26,7 @@ class Blockchain:
             'index': len(self.chain),
             'timestamp': datetime.utcnow().isoformat(),
             'transactions': self.pending_transactions,
-            'prev_hash': prev_hash,
+            'prev_hash': self.last_block()['hash'] if self.length() else prev_hash,
             'nonce': None,  # non-sense
             # P/48
             # think of nonce as a one-off random number, which will be
@@ -54,6 +54,10 @@ class Blockchain:
             'recipient': recipient,
             'amount': amount,
         })
+
+    def add_block(self, block):
+        raise NotImplementedError()
+        # self.chain.append(block)
 
     def proof_of_work(self):
         while True:

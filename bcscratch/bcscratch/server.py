@@ -32,6 +32,7 @@ class Server:
             to our peers
         """
         self.external_ip = await get_external_ip()
+        return self.external_ip
 
     @staticmethod
     def try_schema_load(payload: str) -> (object, bool):
@@ -73,5 +74,9 @@ class Server:
     async def listen(self, hostname='0.0.0.0', port=8888):
         server = await start_server(self.handle_connection, host=hostname, port=port)
         logger.info(f'Server listening on {hostname}:{port}')
+
+        await self.get_external_ip()
+        self.external_port = port
+
         async with server:
             await server.serve_forever()

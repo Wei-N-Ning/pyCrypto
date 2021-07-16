@@ -1,2 +1,2 @@
-def get_external_ip():
-    return None
+async def get_external_ip():
+    return ''
