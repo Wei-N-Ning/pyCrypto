@@ -1,3 +1,7 @@
+"""
+The blockchain data structure and manipulators
+"""
+
 import hashlib
 import json
 import random
