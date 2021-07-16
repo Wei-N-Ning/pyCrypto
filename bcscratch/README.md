@@ -9,3 +9,6 @@ loosely speaking, when a new node joins a network, it should
 create a gossip effect whereby peers of peers learn about its
 presence and can reliably send it future transactions
 
+## asyncio exception handling
+
+read: <https://www.roguelynn.com/words/asyncio-exception-handling/>
