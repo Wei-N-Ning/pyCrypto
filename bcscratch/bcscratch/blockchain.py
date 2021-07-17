@@ -1,17 +1,30 @@
 """
 The blockchain data structure and manipulators
 """
-
-import hashlib
-import json
+import asyncio
 import random
-from datetime import datetime
+import time
+from typing import *
+
+import structlog
+
+from bcscratch.block import Block
+from bcscratch.block import Transaction
+
+logger = structlog.get_logger()
+
+ValidatorT = Callable[[Block], bool]
 
 
 class Blockchain:
     def __init__(self):
-        self.chain = list()
-        self.pending_transactions = list()
+        # to set to mining difficulty
+        self.target: str = '0000' + 'f' * 60
+
+        self.chain: List[Block] = list()
+        self.pending_transactions: List[Transaction] = list()
+
+        # initialization
         self._create_genesis_block()
 
     def _create_genesis_block(self):
@@ -21,26 +34,22 @@ class Blockchain:
     def gen_nonce(size=64):
         return format(random.getrandbits(size), 'x')
 
-    def new_block(self, prev_hash=None) -> dict:
-        block = {
-            'index': len(self.chain),
-            'timestamp': datetime.utcnow().isoformat(),
-            'transactions': self.pending_transactions,
-            'prev_hash': self.last_block()['hash'] if self.length() else prev_hash,
-            'nonce': None,  # non-sense
-            # P/48
-            # think of nonce as a one-off random number, which will be
-            # used as an important source of randomness for our blocks
-        }
-        block['hash'] = self.hash(block)
-        self.pending_transactions = list()
-        return block
+    def new_block(self) -> Block:
+        return Block(
+            len(self.chain),
+            self.pending_transactions,
+            self.last_block().hash if self.length() else None,
+            '',
+            self.target,
+            time.time()
+        )
 
-    @staticmethod
-    def hash(block) -> str:
-        return hashlib.sha256(
-            json.dumps(block, sort_keys=True, indent=None).encode()
-        ).hexdigest()
+    def new_valid_block(self, f: ValidatorT) -> Optional[Block]:
+        b = self.new_block()
+        if not f(b):
+            return None
+        self.pending_transactions = list()
+        return b
 
     def last_block(self):
         return self.chain[-1]
@@ -48,36 +57,71 @@ class Blockchain:
     def length(self):
         return len(self.chain)
 
-    def new_transaction(self, sender, recipient, amount):
-        self.pending_transactions.append({
-            'sender': sender,
-            'recipient': recipient,
-            'amount': amount,
-        })
+    def new_transaction(self, sender, recipient, amount) -> Transaction:
+        tx = Transaction(
+            sender,
+            recipient,
+            amount,
+        )
+        self.pending_transactions.append(tx)
+        return tx
 
     def add_block(self, block):
-        raise NotImplementedError()
-        # self.chain.append(block)
+        self.chain.append(block)
 
-    def proof_of_work(self):
-        while True:
-            new_block = self.new_block()
-            if self.valid_block(new_block):
-                self.chain.append(new_block)
-                return new_block
-
-    @staticmethod
-    def valid_block(block):
+    def proof_of_work(self) -> Block:
         """
         The number of zeros define the difficulty of mining
 
         The addition of a single zero makes an exponential difference
         to the time required to find a solution.
 
+        Returns:
+            a newly created, validated block
+        """
+        while True:
+            new_block = self.new_valid_block(lambda b: b.hash.startswith('0000'))
+            if new_block is not None:
+                self.chain.append(new_block)
+                return new_block
+
+    def recalculate_target(self, block_index: int) -> str:
+        """
+        Returns the number (some kind of threshold) we need to get below to mine a block.
+
         Args:
-            block:
+            block_index: (height) the index number given to a block at its birth
 
         Returns:
+            the new target if recalculated or the current target
+
+            (recall that target sets the mining difficulty)
+        """
+        if block_index > 0 and block_index % 10 == 0:
+            expected_timespan = 10 * 10
+            actual_timespan = self.last_block().timestamp - self.chain[-10].timestamp
+            ratio = actual_timespan / expected_timespan
+            ratio = min(4.0, max(0.25, ratio))
+            new_target = int(self.target, 16) * ratio
+            self.target = format(new_target, 'x').zfill(64)
+            logger.info(f'Calculated new mining target: {self.target}')
+        return self.target
+
+    async def get_blocks_after_timestamp(self, timestamp):
+        for index, block in enumerate(self.chain):
+            if timestamp < block.timestamp:
+                return self.chain[index:]
+
+    async def mine_new_block(self):
+        """
+        identical to proof_of_work() method but is async
 
         """
-        return block['hash'].startswith('0000')
+        self.recalculate_target(self.last_block().index)
+        while True:
+            new_block = self.new_valid_block(lambda b: True)
+            if new_block is not None:
+                await asyncio.sleep(0)
+                self.add_block(new_block)
+                logger.info(f'Found a new block: {new_block}')
+                return new_block

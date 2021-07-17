@@ -8,7 +8,7 @@ from bcscratch.server import Server
 from bcscratch.peers import P2PProtocol
 
 
-logger = structlog.getLogger()
+logger = structlog.get_logger()
 
 
 if __name__ == '__main__':
