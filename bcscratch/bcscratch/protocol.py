@@ -16,10 +16,7 @@ from asyncio import *
 
 import structlog
 
-from bcscratch.messages import *
-from bcscratch.transactions import *
 from bcscratch.server import *
-
 
 logger = structlog.get_logger()
 
@@ -48,12 +45,11 @@ class P2PProtocol:
         self.server: Server = server
         self.blockchain = server.blockchain
 
-
     @staticmethod
     async def send_message(w: StreamWriter, msg: str):
-        pass
+        w.write(msg.encode() + b'\n')
 
-    async def handle_message(self, msg: str, w: StreamWriter):
+    async def handle_message(self, msg: dict, w: StreamWriter):
         """
         This handles an incoming message passed by the server;
 
@@ -66,16 +62,25 @@ class P2PProtocol:
         Returns:
 
         """
+        if msg['name'] == 'ping':
+            await self.handle_ping(msg, w)
+        elif msg['name'] == 'block':
+            await self.handle_block(msg, w)
+        elif msg['name'] == 'transaction':
+            await self.handle_transaction(msg, w)
+        elif msg['name'] == 'peers':
+            await self.handle_peers(msg, w)
+        else:
+            raise P2PError('Missing handler name for message')
+
+    async def handle_ping(self, msg: dict, w: StreamWriter):
         pass
 
-    async def handle_ping(self, msg: str, w: StreamWriter):
+    async def handle_block(self, msg: dict, w: StreamWriter):
         pass
 
-    async def handle_block(self, msg: str, w: StreamWriter):
+    async def handle_transaction(self, msg: dict, w: StreamWriter):
         pass
 
-    async def handle_transaction(self, msg: str, w: StreamWriter):
-        pass
-
-    async def handle_peers(self, msg: str, w: StreamWriter):
+    async def handle_peers(self, msg: dict, w: StreamWriter):
         pass
