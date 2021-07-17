@@ -1,6 +1,8 @@
 """
 The blockchain data structure and manipulators
 """
+__all__ = ['Blockchain']
+
 import asyncio
 import math
 import random

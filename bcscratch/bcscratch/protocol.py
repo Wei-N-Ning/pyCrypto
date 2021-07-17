@@ -14,14 +14,40 @@ StreamWriter)
 
 from asyncio import *
 
+import structlog
+
+from bcscratch.messages import *
+from bcscratch.transactions import *
+from bcscratch.server import *
+
+
+logger = structlog.get_logger()
+
 
 class P2PError(Exception):
     pass
 
 
+message_schema = {
+    'meta': {
+        'address': {
+            'ip': '<external ip: str>',
+            'port': '<external port: int>'
+        },
+        'client': 'bcscratch 0.1'
+    },
+    'message': {
+        'name': '<message name: str>',
+        'payload': '<message payload: object>'
+    }
+}
+
+
 class P2PProtocol:
-    def __init__(self, server):
-        pass
+    def __init__(self, server: Server):
+        self.server: Server = server
+        self.blockchain = server.blockchain
+
 
     @staticmethod
     async def send_message(w: StreamWriter, msg: str):
@@ -53,4 +79,3 @@ class P2PProtocol:
 
     async def handle_peers(self, msg: str, w: StreamWriter):
         pass
-

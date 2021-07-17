@@ -1,6 +1,8 @@
 """
 A basic TCP server
 """
+__all__ = ['Server']
+
 from asyncio import StreamWriter, StreamReader, start_server
 from asyncio.exceptions import IncompleteReadError
 
