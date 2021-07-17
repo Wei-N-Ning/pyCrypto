@@ -4,7 +4,7 @@ active connections communicating with our node
 
 """
 
-from bcscratch.types import *
+from bcscratch.peers import *
 
 from typing import *
 from more_itertools import take

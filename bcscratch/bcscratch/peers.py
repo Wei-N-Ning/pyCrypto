@@ -1,12 +1,19 @@
-"""
-This module contains logic to handle the propagation of messages
-that peers may send us:
+__all__ = [
+    'Peer'
+]
 
-- how we communicate
-
-will call this the P2PProtocol
-"""
+import dataclasses
+from asyncio import *
 
 
-class P2PProtocol:
-    pass
+@dataclasses.dataclass
+class Peer:
+    w: StreamWriter
+    address: str
+    port: int
+
+    def write(self, msg: str):
+        self.w.write(msg.encode())
+
+    def as_str(self) -> str:
+        return f'{self.address}:{self.port}'

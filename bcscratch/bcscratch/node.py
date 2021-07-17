@@ -5,7 +5,7 @@ import structlog
 from bcscratch.blockchain import Blockchain
 from bcscratch.connections import ConnectionPool
 from bcscratch.server import Server
-from bcscratch.peers import P2PProtocol
+from bcscratch.protocol import P2PProtocol
 
 
 logger = structlog.get_logger()
