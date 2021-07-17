@@ -2,6 +2,7 @@
 The blockchain data structure and manipulators
 """
 import asyncio
+import math
 import random
 import time
 from typing import *
@@ -19,7 +20,7 @@ ValidatorT = Callable[[Block], bool]
 class Blockchain:
     def __init__(self):
         # to set to mining difficulty
-        self.target: str = '0000' + 'f' * 60
+        self.target: str = '00' + 'f' * 62
 
         self.chain: List[Block] = list()
         self.pending_transactions: List[Transaction] = list()
@@ -39,7 +40,7 @@ class Blockchain:
             len(self.chain),
             self.pending_transactions,
             self.last_block().hash if self.length() else None,
-            '',
+            self.gen_nonce(),
             self.target,
             time.time()
         )
@@ -103,7 +104,7 @@ class Blockchain:
             ratio = actual_timespan / expected_timespan
             ratio = min(4.0, max(0.25, ratio))
             new_target = int(self.target, 16) * ratio
-            self.target = format(new_target, 'x').zfill(64)
+            self.target = format(math.floor(new_target), 'x').zfill(64)
             logger.info(f'Calculated new mining target: {self.target}')
         return self.target
 
@@ -114,12 +115,15 @@ class Blockchain:
 
     async def mine_new_block(self):
         """
-        identical to proof_of_work() method but is async
-
+        same as proof_of_work() method except:
+        - is async
+        - the validation logic changes: here it checks whether the block's hash is less
+                then the target (string comparison, BAD!)
+                the target gets increasingly smaller as more blocks are added
         """
         self.recalculate_target(self.last_block().index)
         while True:
-            new_block = self.new_valid_block(lambda b: True)
+            new_block = self.new_valid_block(lambda b: b.hash < self.target)
             if new_block is not None:
                 await asyncio.sleep(0)
                 self.add_block(new_block)

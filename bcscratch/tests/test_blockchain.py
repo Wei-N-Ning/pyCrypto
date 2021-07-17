@@ -1,3 +1,4 @@
+import asyncio
 import unittest
 
 from bcscratch import blockchain
@@ -22,3 +23,12 @@ class TestBlockchain(unittest.TestCase):
         b1 = chain.proof_of_work()
         self.assertEqual(2, chain.length())
         self.assertTrue(b1.hash.startswith('0000'))
+
+    def test_ensure_target_recalculation(self):
+        chain = blockchain.Blockchain()
+        old_target = chain.target
+        for _ in range(12):
+            asyncio.run(chain.mine_new_block())
+        new_target = chain.target
+        self.assertNotEqual(old_target, new_target)
+        self.assertLess(new_target, old_target)
