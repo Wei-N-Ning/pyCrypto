@@ -12,18 +12,18 @@ from more_itertools import take
 
 class ConnectionPool:
     def __init__(self):
-        self.pool: Dict[str, Peer] = dict()
+        self.pool: Dict[str, PeerWriter] = dict()
 
-    def add_peer(self, p: Peer):
+    def add_peer(self, p: PeerWriter):
         self.pool[p.as_str()] = p
 
-    def remove_peer(self, p: Peer):
+    def remove_peer(self, p: PeerWriter):
         try:
             del self.pool[p.as_str()]
         except KeyError:
             pass
 
-    def get_alive_peers(self, count: int) -> List[Peer]:
+    def get_alive_peers(self, count: int) -> List[PeerWriter]:
         return take(count, self.pool.values())
 
     def broadcast(self, msg: str):

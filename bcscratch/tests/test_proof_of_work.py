@@ -13,7 +13,15 @@ def do_hash(payload: [int]) -> str:
 
 
 def prove(h: str) -> bool:
-    return int('0x' + h[-7:], 16) < 1000
+    """
+    Super low mining difficulty to save time
+    Args:
+        h:
+
+    Returns:
+
+    """
+    return int('0x' + h[:7], 16) < 100000
 
 
 def trial() -> [int]:

@@ -18,7 +18,7 @@ import structlog
 
 from bcscratch.messages import create_peers_message, create_block_message, create_transaction_message, \
     create_ping_message
-from bcscratch.peers import Peer
+from bcscratch.peers import PeerWriter
 from bcscratch.server import *
 from bcscratch.transactions import Transaction
 
@@ -136,5 +136,5 @@ class P2PProtocol:
         )
         for peer in peers:
             _, w = await asyncio.open_connection(peer.address, peer.port)
-            self.server.connection_pool.add_peer(Peer(w, peer.address, peer.port))
+            self.server.connection_pool.add_peer(PeerWriter(w, peer['ip'], peer['port']))
             await self.send_message(w, ping_message)
