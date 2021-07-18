@@ -54,10 +54,10 @@ class Blockchain:
         self.pending_transactions = list()
         return b
 
-    def last_block(self):
+    def last_block(self) -> Block:
         return self.chain[-1]
 
-    def length(self):
+    def length(self) -> int:
         return len(self.chain)
 
     def new_transaction(self, sender, recipient, amount) -> Transaction:
@@ -71,6 +71,10 @@ class Blockchain:
 
     def add_block(self, block):
         self.chain.append(block)
+
+    def valid_add_block(self, block):
+        if block.hash < self.target:
+            self.chain.append(block)
 
     def proof_of_work(self) -> Block:
         """

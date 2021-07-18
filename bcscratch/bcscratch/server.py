@@ -6,9 +6,11 @@ __all__ = ['Server']
 from asyncio import StreamWriter, StreamReader, start_server
 from asyncio.exceptions import IncompleteReadError
 
+from typing import *
 import structlog
 from marshmallow.exceptions import MarshmallowError
 
+from bcscratch.blockchain import Blockchain
 from bcscratch.messages import BaseSchema
 from bcscratch.utils import get_external_ip
 
@@ -17,7 +19,7 @@ logger = structlog.get_logger()
 
 class Server:
     def __init__(self, blockchain, connection_pool, protocol):
-        self.blockchain = blockchain
+        self.blockchain: Blockchain = blockchain
         self.connection_pool = connection_pool
         self.protocol = protocol
         self.external_ip = None
@@ -37,11 +39,11 @@ class Server:
         return self.external_ip
 
     @staticmethod
-    def try_schema_load(payload: str) -> (object, bool):
+    def try_schema_load(payload: str) -> Tuple[dict, bool]:
         try:
             return BaseSchema().loads(payload), True
         except MarshmallowError:
-            return None, False
+            return dict(), False
 
     async def handle_connection(self, r: StreamReader, w: StreamWriter):
         """
@@ -61,7 +63,7 @@ class Server:
                 if not ok:
                     logger.info(f'Received unreadable message from peer: {w}')
                     break
-                w.address = msg['meta']['address']
+                w.__setattr__('address', msg['meta']['address'])
                 self.connection_pool.add_peer(w)
                 await self.protocol.handle_message(msg, w)
                 await w.drain()
