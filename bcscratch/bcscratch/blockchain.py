@@ -11,12 +11,12 @@ from typing import *
 
 import structlog
 
-from bcscratch.block import Block
-from bcscratch.block import Transaction
+from bcscratch.block import Blk
+from bcscratch.block import TX
 
 logger = structlog.get_logger()
 
-ValidatorT = Callable[[Block], bool]
+ValidatorT = Callable[[Blk], bool]
 
 
 class Blockchain:
@@ -24,8 +24,8 @@ class Blockchain:
         # to set to mining difficulty
         self.target: str = '00' + 'f' * 62
 
-        self.chain: List[Block] = list()
-        self.pending_transactions: List[Transaction] = list()
+        self.chain: List[Blk] = list()
+        self.pending_transactions: List[TX] = list()
 
         # initialization
         self._create_genesis_block()
@@ -37,8 +37,8 @@ class Blockchain:
     def gen_nonce(size=64):
         return format(random.getrandbits(size), 'x')
 
-    def new_block(self) -> Block:
-        return Block(
+    def new_block(self) -> Blk:
+        return Blk(
             len(self.chain),
             self.pending_transactions,
             self.last_block().hash if self.length() else None,
@@ -47,21 +47,21 @@ class Blockchain:
             time.time()
         )
 
-    def new_valid_block(self, f: ValidatorT) -> Optional[Block]:
+    def new_valid_block(self, f: ValidatorT) -> Optional[Blk]:
         b = self.new_block()
         if not f(b):
             return None
         self.pending_transactions = list()
         return b
 
-    def last_block(self) -> Block:
+    def last_block(self) -> Blk:
         return self.chain[-1]
 
     def length(self) -> int:
         return len(self.chain)
 
-    def new_transaction(self, sender, recipient, amount) -> Transaction:
-        tx = Transaction(
+    def new_transaction(self, sender, recipient, amount) -> TX:
+        tx = TX(
             sender,
             recipient,
             amount,
@@ -76,7 +76,7 @@ class Blockchain:
         if block.hash < self.target:
             self.chain.append(block)
 
-    def proof_of_work(self) -> Block:
+    def proof_of_work(self) -> Blk:
         """
         The number of zeros define the difficulty of mining
 

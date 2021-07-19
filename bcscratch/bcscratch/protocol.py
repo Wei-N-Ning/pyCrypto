@@ -20,7 +20,7 @@ from bcscratch.messages import create_peers_message, create_block_message, creat
     create_ping_message
 from bcscratch.peers import PeerWriter
 from bcscratch.server import *
-from bcscratch.transactions import Transaction
+from bcscratch.transactions import TX
 
 logger = structlog.get_logger()
 
@@ -99,7 +99,7 @@ class P2PProtocol:
 
     async def handle_transaction(self, msg: dict, _: StreamWriter):
         tx = msg['payload']
-        if Transaction.validate(tx):
+        if TX.validate(tx):
             if tx not in self.server.blockchain.pending_transactions:
                 self.server.blockchain.pending_transactions.append(tx)
                 for peer in self.server.connection_pool.get_alive_peers(20):
