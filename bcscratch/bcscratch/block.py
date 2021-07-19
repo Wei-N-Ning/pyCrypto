@@ -1,4 +1,4 @@
-__all__ = ['Blk']
+__all__ = ['Blk', 'Block']
 
 import dataclasses
 import hashlib
